@@ -13,54 +13,79 @@ from flask import Flask, request, session, g, redirect, url_for, \
 #
 import plotly.plotly as py
 import plotly.graph_objs as go
+#
+from contextlib import closing
 
 
 #######################################################################
+import os
+from sqlite3 import dbapi2 as sqlite3
+from flask import Flask, request, session, g, redirect, url_for, abort, \
+     render_template, flash
 
-DATABASE = '/tmp/cw.sqlite'
-DEBUG = True
-SECRET_KEY = '61aBearsMWF23'
-USERNAME = 'admin'
-PASSWORD = 'GoBears2019'
-
+# create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config.from_envvar('CW_SETTINGS', silent=True)
+
+
+# Load default config and override config from an environment variable
+app.config.update(dict(
+    DATABASE=os.path.join(app.root_path, 'flaskr.db'),
+    DEBUG=True,
+    SECRET_KEY='development key',
+    USERNAME='admin',
+    PASSWORD='default'
+))
+
+
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
 
 
-#######################################################################
 
-@app.before_request
-def before_request():
-    g.db = connect_db()
 
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
+def get_db():
+    """Opens a new database connection if there is none yet for the
+    current application context.
+    """
+    if not hasattr(g, 'sqlite_db'):
+        g.sqlite_db = connect_db()
+    return g.sqlite_db
 
-#######################################################################
+
+@app.teardown_appcontext
+def close_db(error):
+    """Closes the database again at the end of the request."""
+    if hasattr(g, 'sqlite_db'):
+        g.sqlite_db.close()
+
 
 @app.route('/')
 def show_entries():
-    cur = g.db.execute('select title, text from entries order by id desc')
-    entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    db = get_db()
+    cur = db.execute('select title, text from entries order by id desc')
+    entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
+
 
 @app.route('/add', methods=['POST'])
 def add_entry():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into entries (title, text) values (?, ?)',
-                 [request.form['title'], request.form['text']])
-    g.db.commit()
+    db = get_db()
+    db.execute('insert into entries (title, text) values (?, ?)',
+               [request.form['title'], request.form['text']])
+    db.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -76,17 +101,12 @@ def login():
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
+
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
-
-
-#######################################################################
-
-if __name__ == '__main__':
-    app.run()
 
 class RegistrationForm(Form):
     username = TextField('Username', [validators.Length(min=4, max=25)])
@@ -98,6 +118,7 @@ class RegistrationForm(Form):
 
 
 #######################################################################
-
+if __name__ == '__main__':
+    app.run()
 
 
