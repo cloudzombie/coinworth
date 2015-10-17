@@ -77,8 +77,6 @@ def show_entries():
 
 @app.route('/add', methods=['POST'])
 def add_entry():
-    if not session.get('logged_in'):
-        abort(401)
     db = get_db()
     db.execute('insert into entries (title, text) values (?, ?)',
                [request.form['title'], request.form['text']])

@@ -9,6 +9,7 @@ import time
 #      	 Abstractions         #
 ###############################
 
+
 def response_dict():
 	"""Sends an HTML request to BitStamp and returns the response as a python dictionary of  BTC prices with values as floats
 	last - last BTC price
@@ -21,6 +22,8 @@ def response_dict():
 	"""
 	response=requests.get('https://www.bitstamp.net/api/ticker/')
 	return response.json()
+
+d=response_dict()
 
 def get_last(d):
 	"""Returns the last BTC price"""
@@ -88,18 +91,18 @@ def update_prices(row_temp):
 
 def user_dict(row):
 	return {
-		'id': row[0]
-		'name': row[1]
-		'contact': row[2]
-		'check_val':row[3]
-		'usd_val': row[4]
-		'operator': row[5]
+		'id': row[0],
+		'name': row[1],
+		'contact': row[2],
+		'check_val':row[3],
+		'usd_val': row[4],
+		'operator': row[5],
 		'notify': row[6]
 	}
 
 def at_least(user_check, user_usd, market=get_last(d)):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth at least the user defined USD amount"""
-	return user_check*(1/market)=>user_usd
+	return user_check*(1/market)>=user_usd
 
 def at_most(user_check, user_usd, market=get_last(d)):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth no more than the user defined USD amount"""
