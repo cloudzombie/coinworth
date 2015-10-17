@@ -22,6 +22,7 @@ def response_dict():
 	"""
 	response=requests.get('https://www.bitstamp.net/api/ticker/')
 	return response.json()
+d= response_dict()
 
 d=response_dict()
 
@@ -54,14 +55,18 @@ def get_ask(d):
 	"""Returns the lowest sell order"""
 	return float(d["bid"])
 
+def get_time(d):
+	"""Returns  the current time"""
+	return datetime.datetime.fromtimestamp(int(d["timestamp"])).strftime('%m-%d %H:%M:%S')
+
 def create_row_template(d):
 	"""Creates a tuple that represents a single row in a table"""
-	return (get_last(d), get_high(d), get_low(d), get_vwap(d), get_volume(d), get_bid(d), get_ask(d))
+	return (get_last(d), get_high(d), get_low(d), get_vwap(d), get_volume(d), get_bid(d), get_ask(d), get_time(d))
 
-def create_price_table():
-	connect=sqlite3.connect('test_table.sqlite')
+def create_price_table(connection='test_table.sqlite'):
+	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
-	cursor.execute('''CREATE TABLE prices            (last real, high real, low real, vwap real, volume real, bid real, ask real)''')
+	cursor.execute('''CREATE TABLE prices(id int, last real, high real, low real, vwap real, volume real, bid real, ask real, time timestamp)''')
 	connect.commit()
 
 def create_user_table():
@@ -77,17 +82,23 @@ def create_user_table():
 	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), check_val real , usd_val real, operator int, notify int''')
 	connect.commit()
 	
-def update_prices(row_temp):
+def update_prices(row_temp, connection='test_table.sqlite'):
 	"""Updates database of prices with the values from the row template passed as a tuple"""
-	assert len(row_temp)==7, "Invalid row template"
+	assert len(row_temp)==9, "Invalid row template"
 	#Establish databse connection
-	connect=sqlite3.connect('test_table.sqlite')
+	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
 
 	#Insert new rows
-	cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?)",
+	cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             row_temp)
 	connect.commit()
+
+def get_column(column, table, connection='test_table.sqlite'):
+	"""gets all the data from a single column in the data and returns an ordered list"""
+	connect=sqlite3.connect(connection)
+	cursor=connect.cursor()
+	return [row for row in cursor.execute('SELECT ' + column + ' from '  + table)]
 
 def user_dict(row):
 	return {
