@@ -24,7 +24,6 @@ def response_dict():
 	return response.json()
 d= response_dict()
 
-d=response_dict()
 
 def get_last(d):
 	"""Returns the last BTC price"""
@@ -79,7 +78,7 @@ def create_user_table():
 
 	connect=sqlite3.connect('test_users.sqlite')
 	cursor=connect.cursor()
-	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), check_val real , usd_val real, operator int, notify int''')
+	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), btc_amount real , usd_val real, operator int, notify int)''')
 	connect.commit()
 	
 def update_prices(row_temp, connection='test_table.sqlite'):
@@ -105,23 +104,36 @@ def user_dict(row):
 		'id': row[0],
 		'name': row[1],
 		'contact': row[2],
-		'check_val':row[3],
+		'btc_amount':row[3],
 		'usd_val': row[4],
 		'operator': row[5],
 		'notify': row[6]
 	}
 
-def at_least(user_check, user_usd, market=get_last(d)):
+
+def at_least(user_btc, user_usd, market=get_last(d)):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth at least the user defined USD amount"""
-	return user_check*(1/market)>=user_usd
+	return user_btc*(1/market)>=user_usd
 
-def at_most(user_check, user_usd, market=get_last(d)):
+def at_most(user_btc, user_usd, market=get_last(d)):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth no more than the user defined USD amount"""
-	return user_check*(1/market)<=user_usd
+	return user_btc*(1/market)<=user_usd
 
-def minus_five_percent(a, b):
-	"""Returns True if the user's BTC amount has fallen by 5\% n value"""
-	
+def minus_five_percent(user_btc, market):
+	"""Returns True if the user's BTC amount has fallen by 5 percent in value"""
+	return user_btc/market<=0.95
+
+def plus_five_percent(user_btc, market):
+	return user_btc/market>=1.05
+
+func_dict = {
+	"0": at_least
+	"1": at_most
+	"2": plus_five_percent
+	"3": minus_five_percent
+
+}
+
 
 
 def perform_check(d):
@@ -131,24 +143,13 @@ def perform_check(d):
 	compare=None
 	body=None
 	for user in [user_dict(row) for row in cursor.execute('SELECT * FROM users')]:
-		if not user['operator']:
-			compare=at_least
-			body=0
-		elif user['operator']==1:
-			compare=at_most
-			body=1
-		elif user['operator']==2:
-			compare=minus_five_percent
-			body=2
-		elif user['operator']==3:
-			compare=plus_five_percent
-			body=3
+		compare=func_dict[str(user[operator])]
 		if compare(user['check_val'], user['usd_val']):
 			notify(user['name'], user['contact'], body)
 
 def notify(name, contact, body):
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
-	pass
+	print(name + "notified")
 
 
 

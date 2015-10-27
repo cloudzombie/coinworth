@@ -1,0 +1,16 @@
+ <html>
+    <head>
+        <title>Thank you!</title>
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div id="container">
+            <div class="title">
+                <h1>Thank you for using coinworth, {{name}}.</h1>
+            </div>
+            <div id="content">
+                You will be notified when your {{btc_amount}} BTC {{operator}}!
+            </div>
+        </div>
+    </body>
+</html>
