@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Handle POST requests with Flask</title>
+        <title>Coinworth.</title>
         <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
@@ -23,10 +23,10 @@
                   <input type="text" name="youremail" /><br />
 
                   <label for="btc_amount">Please enter your BTC amount:</label>
-                  <input type="number" name="btc_amount" /><br />
+                  <input type="real" name="btc_amount" /><br />
 
                   <label for="usd_val">Please specify a USD value:</label>
-                  <input type="number" name="usd_val" /><br />
+                  <input type="real" name="usd_val" /><br />
 
                   <label for="operator">Notify me when my BTC:</label>
                   <br>
@@ -38,7 +38,7 @@
                   <br>
                   <input type="radio" name="operator" value="3"> has dropped 5% in value.
                   <br>
-                  
+                  <br>
                   <input type="submit" />
                 </form>
             </div>
