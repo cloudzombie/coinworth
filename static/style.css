@@ -23,6 +23,12 @@ a {
     height: 50px;
 }
 
+#title_pic {
+    width: 180px;
+    margin-top: 5px;
+
+}
+
 h1 {
     color: #fff;
     margin: 0;
