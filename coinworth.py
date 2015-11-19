@@ -8,27 +8,31 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 from flask.ext.mail import Mail # mail module
 from flask.ext.wtf import Form
-from wtforms.fields import TextField, PasswordField,  BooleanField, FloatField, RadioField, SelectField
+from wtforms.fields import TextField, PasswordField,  BooleanField, \
+         FloatField, RadioField, SelectField
 from wtforms import validators
 # DB tools
 from contextlib import closing
 # Utility code
 from abstractions import *
 import os
-
 ##########################################################################
 
 # Initialize the Flask application
 app = Flask(__name__)
-mailbox = Mail(app) # Initialize mail
 
 # Configuring Flask Mail with gmail
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'coinworthupdate@gmail.com'
-app.config['MAIL_PASSWORD'] = 'fakepass;'
+app.config['MAIL_PASSWORD'] = 'fakepass'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_SUPRESS_SEND'] = False
+app.config['TESTING'] = False
+app.config['MAIL_DEBUG'] = True
+
+mailbox = Mail(app) # Initialize mail
 
 # Define a route for the default URL, which loads the form
 @app.route('/')
@@ -54,7 +58,7 @@ def entry(ID=1):
     cursor.execute("INSERT into users values (?, ?, ?, ?, ?, ?)",
             (ID, name, email, btc_amount, usd_val, operator))
     connect.commit()
-
+    ID+=1
     return render_template('confirmation.html', name=name, btc_amount=btc_amount, usd_val=usd_val, operator=operator)
 
 
@@ -81,6 +85,6 @@ def run_check():
 # Run the app :)
 if __name__ == '__main__':
   app.run(  debug=True,
-        host="0.0.0.0",
-        port=int("80")
+            host="0.0.0.0",
+            port=int("80")
   )
