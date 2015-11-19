@@ -4,11 +4,14 @@ import simplejson as json
 import sqlite3
 import schedule
 import time
+from flask.ext.mail import Message # mail tools
+from coinworth import app, mailbox
 
 ###############################
 #      	 Abstractions         #
 ###############################
 
+notified = [] # A lit of notified users
 
 def response_dict():
 	"""Sends an HTML request to BitStamp and returns the response as a python dictionary of  BTC prices with values as floats
@@ -20,9 +23,9 @@ def response_dict():
 	bid - highest buy order
 	ask - lowest sell order
 	"""
-	response=requests.get('https://www.bitstamp.net/api/ticker/')
+	response = requests.get('https://www.bitstamp.net/api/ticker/')
 	return response.json()
-d= response_dict()
+
 
 
 def get_last(d):
@@ -65,7 +68,7 @@ def create_row_template(d):
 def create_price_table(connection='test_table.sqlite'):
 	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
-	cursor.execute('''CREATE TABLE prices(id int, last real, high real, low real, vwap real, volume real, bid real, ask real, time timestamp)''')
+	cursor.execute('''CREATE TABLE prices(last real, high real, low real, vwap real, volume real, bid real, ask real, time timestamp)''')
 	connect.commit()
 
 def create_user_table():
@@ -78,28 +81,29 @@ def create_user_table():
 
 	connect=sqlite3.connect('test_users.sqlite')
 	cursor=connect.cursor()
-	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), btc_amount real , usd_val real, operator int, notify int)''')
+	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), btc_amount real , usd_val real, operator int)''')
 	connect.commit()
 	
 def update_prices(row_temp, connection='test_table.sqlite'):
 	"""Updates database of prices with the values from the row template passed as a tuple"""
-	assert len(row_temp)==9, "Invalid row template"
+	assert len(row_temp) == 8, "Invalid row template"
 	#Establish databse connection
 	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
 
 	#Insert new rows
-	cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?)",
             row_temp)
 	connect.commit()
 
 def get_column(column, table, connection='test_table.sqlite'):
-	"""gets all the data from a single column in the data and returns an ordered list"""
+	"""Gets all the data from a single column in the table and returns an ordered list"""
 	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
 	return [row for row in cursor.execute('SELECT ' + column + ' from '  + table)]
 
 def user_dict(row):
+	"""Creates a dictionary for easy access to user information"""
 	return {
 		'id': row[0],
 		'name': row[1],
@@ -107,49 +111,62 @@ def user_dict(row):
 		'btc_amount':row[3],
 		'usd_val': row[4],
 		'operator': row[5],
-		'notify': row[6]
 	}
 
 
-def at_least(user_btc, user_usd, market=get_last(d)):
+def at_least(user_btc, market, user_usd):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth at least the user defined USD amount"""
 	return user_btc*(1/market)>=user_usd
 
-def at_most(user_btc, user_usd, market=get_last(d)):
+def at_most(user_btc, market, user_usd):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth no more than the user defined USD amount"""
 	return user_btc*(1/market)<=user_usd
 
-def minus_five_percent(user_btc, market):
+def minus_five_percent(user_btc, market, user_usd=None):
 	"""Returns True if the user's BTC amount has fallen by 5 percent in value"""
 	return user_btc/market<=0.95
 
-def plus_five_percent(user_btc, market):
+def plus_five_percent(user_btc, market, user_usd=None):
 	return user_btc/market>=1.05
 
+ 
 func_dict = {
-	"0": at_least
-	"1": at_most
-	"2": plus_five_percent
+# A dictionary for quick access to the comparator functions 
+	"0": at_least,
+	"1": at_most,
+	"2": plus_five_percent,
 	"3": minus_five_percent
-
 }
 
 
 
 def perform_check(d):
-	connect=sqlite3.connect('test_users.sqlite')
-	cursor=connect.cursor()
+	"""Checks if user-specified event has been triggered, and calls the notification procedure if user has not been notified before"""
 
-	compare=None
-	body=None
+	connect = sqlite3.connect('test_users.sqlite') # Connecting to the database of users
+	cursor = connect.cursor()
+
+	compare = None  # Initializing the local variables for reassignment below
+	body = None
+
+	# Iterating through users in the table
 	for user in [user_dict(row) for row in cursor.execute('SELECT * FROM users')]:
-		compare=func_dict[str(user[operator])]
-		if compare(user['check_val'], user['usd_val']):
-			notify(user['name'], user['contact'], body)
+		compare = func_dict[str(user[operator])] # Select the comparator
+		if compare(user['check_val'], get_last(d), user['usd_val']) and user['contact'] not in notified:
+			notify(user['name'], user['contact'], message) # Calling notification procedure
+			notified.append(user['contact']) # Adding the user to the list of notified users.
 
-def notify(name, contact, body):
+#TODO: test everything below
+def notify(name, contact, message):
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
-	print(name + "notified")
+	msg = Message(
+              'This is a test',
+	       sender='google.com',
+	       recipients=
+               [contact])
+	msg.body = "Hello, %s. This is a test" % name
+	mail.send(msg)
+	return "Sent"
 
 
 
