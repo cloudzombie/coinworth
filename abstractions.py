@@ -86,21 +86,40 @@ def create_user_table():
 	
 def update_prices(row_temp, connection='test_table.sqlite'):
 	"""Updates database of prices with the values from the row template passed as a tuple"""
-	assert len(row_temp) == 8, "Invalid row template"
+	'''temporarily takes 8 or 9 length to make input work with or wothout row IDs'''
+	assert len(row_temp) == 8 or len(row_temp) == 9, "Invalid row template"
 	#Establish databse connection
 	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
 
 	#Insert new rows
-	cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?)",
-            row_temp)
-	connect.commit()
+	if len(row_temp) == 8:
+		cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?)",
+	            row_temp)
+		connect.commit()
+	else:
+		cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	            row_temp)
+		connect.commit()
 
-def get_column(column, table, connection='test_table.sqlite'):
+def get_column(column, table, connection='test_table.sqlite', min_id = False):
 	"""Gets all the data from a single column in the table and returns an ordered list"""
+	"""temporary If/ Else for when last argument isn't present"""
 	connect=sqlite3.connect(connection)
 	cursor=connect.cursor()
-	return [row for row in cursor.execute('SELECT ' + column + ' from '  + table)]
+	if type(min_id) == int:
+		return [row for row in cursor.execute('SELECT ' + column + ' from '  + table + ' WHERE id > ' + str(min_id) )]
+	else:
+		return [row for row in cursor.execute('SELECT ' + column + ' from '  + table)]
+
+
+def count_rows(table, connection = 'test_table.sqlite'):
+	'''returns the number of rows in a specific table, given the table and file'''
+	connect=sqlite3.connect(connection)
+	cursor=connect.cursor()
+	cursor.execute('SELECT COUNT(*) FROM ' + table)
+	row_num_tuple = cursor.fetchone()
+	return row_num_tuple[0]
 
 def user_dict(row):
 	"""Creates a dictionary for easy access to user information"""
