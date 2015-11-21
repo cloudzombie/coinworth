@@ -67,7 +67,7 @@ def initialize():
 	with app.app_context():
 		print("starting")
 		apsched = BackgroundScheduler()
-		apsched.add_job(run_check, 'interval', seconds=15)
+		apsched.add_job(run_check, 'interval', seconds=60)
 		apsched.start()
 
 
