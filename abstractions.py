@@ -135,16 +135,16 @@ def user_dict(row):
 
 def at_least(user_btc, market, user_usd):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth at least the user defined USD amount"""
-	return float(user_btc)/market>=user_usd
+	return float(user_btc)*float(market)>=user_usd
 
 def at_most(user_btc, market, user_usd):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth no more than the user defined USD amount"""
-	return float(user_btc)/market<=user_usd
+	return float(user_btc)*float(market)<=user_usd
 
 def minus_five_percent(user_btc, market, user_usd=None):
 	#THIS IS INCORRECT
 	"""Returns True if the user's BTC amount has fallen by 5 percent in value"""
-	return float(user_btc)/market<=0.95
+	return float(user_btc)/float(market)<=0.95
 
 def plus_five_percent(user_btc, market, user_usd=None):
 	#THIS IS INCORRECT
@@ -170,23 +170,32 @@ def perform_check(d):
 	compare = None  # Initializing the local variables for reassignment below
 	message = None
 
+	print("perform check")
+
 	# Iterating through users in the table
 	for user in [user_dict(row) for row in cursor.execute('SELECT * FROM users')]:
+		print(user)
 		compare = func_dict[str(user['operator'])] # Select the comparator
-		if compare(user['btc_val'], get_last(d), user['usd_val']): # (delete ':', this statement and uncomment) # and user['contact'] not in notified: 
+		print(compare)
+		if compare(user['btc_val'], d['last'], user['usd_val']): # (delete ':', this statement and uncomment) # and user['contact'] not in notified: 
+			print("goinggg ")
 			notify(user['name'], user['contact'], message) # Calling notification procedure
 			#notified.append(user['contact']) # Adding the user to the list of notified users.
 
 #TODO: test everything below
 def notify(name, contact, message):
+	print("notify")
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
 	msg = Message(
               'This is a test',
 	       sender='coinworthupdate@gmail.com',
 	       recipients=
                [contact])
+	print('here?')
 	msg.body = "Hello, %s. This is a test" % name
+	print("here")
 	mailbox.send(msg)
+	print('sent')
 	return "Sent"
 
 
