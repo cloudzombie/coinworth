@@ -78,7 +78,7 @@ def run_check():
 		row = create_row_template(d) # Row factory
 		update_prices(row, connection='test_table.sqlite') # Insert row
 		perform_check(d) 
-		return "running"
+
 
 
 

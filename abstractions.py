@@ -75,7 +75,8 @@ def create_user_table():
 	"""Creates a table of users with numbered rows containing 
 	name - user's name (text)
 	contact - user's email (text)
-	check_val - user's value to be compared (float)
+	btc_amount - user's value to be compared (float)
+	usd_val - user's desired value in USD
 	operator - function used to compare check_val to market price (0 or 1)
 	notify - 1 if user is to be notified, 0 if user has already been notified"""
 
@@ -127,7 +128,7 @@ def user_dict(row):
 		'id': row[0],
 		'name': row[1],
 		'contact': row[2],
-		'btc_val':row[3],
+		'btc_amount':row[3],
 		'usd_val': row[4],
 		'operator': row[5],
 	}
@@ -177,7 +178,7 @@ def perform_check(d):
 		print(user)
 		compare = func_dict[str(user['operator'])] # Select the comparator
 		print(compare)
-		if compare(user['btc_val'], d['last'], user['usd_val']): # (delete ':', this statement and uncomment) # and user['contact'] not in notified: 
+		if compare(user['btc_amount'], d['last'], user['usd_val']): # (delete ':' + this statement and uncomment) # and user['contact'] not in notified: 
 			print("goinggg ")
 			notify(user['name'], user['contact'], message) # Calling notification procedure
 			#notified.append(user['contact']) # Adding the user to the list of notified users.
@@ -195,8 +196,8 @@ def notify(name, contact, message):
 	msg.body = "Hello, %s. This is a test" % name
 	print("here")
 	mailbox.send(msg)
-	print('sent')
-	return "Sent"
+	print('Sent')
+
 
 
 
