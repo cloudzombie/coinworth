@@ -1,10 +1,12 @@
 # coinworth
-BitCoin data visualization + notification service
+BitCoin data visualization + notification service.
 TODO:
-form.html: display the message correctly,
+form.html: display the message correctly + add required validators,
 DONE write email notification function,
 DONE schedule processing job + test,
 DONE embed graph,
 style, 
 write email templates,
-rewrite graph.
+rewrite graph,
+switch to real databases,
+delete test code.
