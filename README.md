@@ -1,8 +1,10 @@
 # coinworth
 BitCoin data visualization + notification service
-TO DO:
-form.html: display the message correctly
-write email notification function
-schedule processing job + test
-embed graph
-style 
+TODO:
+form.html: display the message correctly,
+DONE write email notification function,
+DONE schedule processing job + test,
+DONE embed graph,
+style, 
+write email templates,
+rewrite graph.
