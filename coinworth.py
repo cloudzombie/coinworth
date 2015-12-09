@@ -41,8 +41,6 @@ def form():
 # accepting: POST requests 
 @app.route('/confirmation/', methods=['POST'])
 def entry(ID=1):
-	print('goin')
-
 	name=request.form['yourname']
 	email=request.form['youremail']
 	btc_amount=request.form['btc_amount']
