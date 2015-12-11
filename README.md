@@ -17,11 +17,11 @@ switch to real databases
 
 delete test code
 
-###Graph
+###Graph:
 
 ban graph editing tools on the website
 
-**replace Bitstamp queries with databse queries**
+**replace Bitstamp queries with database queries**
 
 fix streaming
 
