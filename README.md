@@ -1,4 +1,4 @@
-# coinworth
+# Coinworth
 BitCoin data visualization + notification service. Written in Python using Flask.
 ##**TODO**:
 form.html: display the message correctly + add required validators
@@ -13,9 +13,18 @@ style
 
 write email templates
 
-rewrite graph
-
 switch to real databases
 
 delete test code
+
+###Graph
+
+ban graph editing tools on the website
+
+**replace Bitstamp queries with databse queries**
+
+fix streaming
+
+
+
 
