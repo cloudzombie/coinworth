@@ -9,6 +9,8 @@ form.html: display the message correctly + add required validators
 
 **DONE** embed graph
 
+control for notified users
+
 style 
 
 write email templates
