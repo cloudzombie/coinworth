@@ -185,16 +185,14 @@ def perform_check(d):
 
 #TODO: test everything below
 def notify(name, contact, message):
-	print("notify")
+	print("Notifying...")
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
 	msg = Message(
               'This is a test',
 	       sender='coinworthupdate@gmail.com',
 	       recipients=
                [contact])
-	print('here?')
 	msg.body = "Hello, %s. This is a test" % name
-	print("here")
 	mailbox.send(msg)
 	print('Sent')
 
