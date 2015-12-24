@@ -198,6 +198,10 @@ def perform_check(d):
 
 def notify(name, contact, message):
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+	print("Notifying...")
+>>>>>>> origin/master
 =======
 	print("Notifying...")
 >>>>>>> origin/master
@@ -210,7 +214,10 @@ def notify(name, contact, message):
                [contact])
 	msg.body = "Hello, %s. This is a test" % name
 <<<<<<< HEAD
+<<<<<<< HEAD
 	print("Passing to the mailbox...")
+=======
+>>>>>>> origin/master
 =======
 >>>>>>> origin/master
 	mailbox.send(msg)
