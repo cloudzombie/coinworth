@@ -197,14 +197,6 @@ def perform_check(d):
 
 
 def notify(name, contact, message):
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-	print("Notifying...")
->>>>>>> origin/master
-=======
-	print("Notifying...")
->>>>>>> origin/master
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
 	print("Creating a message object...")
 	msg = Message(
@@ -213,13 +205,7 @@ def notify(name, contact, message):
 	       recipients=
                [contact])
 	msg.body = "Hello, %s. This is a test" % name
-<<<<<<< HEAD
-<<<<<<< HEAD
 	print("Passing to the mailbox...")
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
 	mailbox.send(msg)
 	print('Sent!')
 
