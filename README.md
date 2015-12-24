@@ -23,7 +23,7 @@ delete test code
 
 ban graph editing tools on the website
 
-**replace Bitstamp queries with database queries**
+**DONE** replace Bitstamp queries with database queries
 
 fix streaming
 
