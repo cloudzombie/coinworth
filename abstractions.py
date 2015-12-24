@@ -78,13 +78,13 @@ def create_user_table():
 	btc_amount - user's value to be compared (float)
 	usd_val - user's desired value in USD
 	operator - function used to compare check_val to market price (0 or 1)
-	notify - 1 if user is to be notified, 0 if user has already been notified"""
+	curr_price - btc price at the moment of the user's submission"""
 
 	connect=sqlite3.connect('test_users.sqlite')
 	cursor=connect.cursor()
-	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), btc_amount real , usd_val real, operator int)''')
+	cursor.execute('''CREATE TABLE users            (RowID int, name varchar(35), contact varchar(50), btc_amount real , usd_val real, operator int, curr_price real)''')
 	connect.commit()
-	
+
 def update_prices(row_temp, connection='test_table.sqlite'):
 	"""Updates database of prices with the values from the row template passed as a tuple"""
 	'''temporarily takes 8 or 9 length to make input work with or wothout row IDs'''
@@ -102,6 +102,16 @@ def update_prices(row_temp, connection='test_table.sqlite'):
 		cursor.execute("INSERT into prices values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 	            row_temp)
 		connect.commit()
+
+def update_users(ID, name, email, btc_amount, usd_val, operator, curr_price):
+	#Establishing databse connection
+	connect=sqlite3.connect('test_users.sqlite')
+	cursor=connect.cursor()
+	#Inserting new rows
+	cursor.execute("INSERT into users values (?, ?, ?, ?, ?, ?, ?)", # data abstraction violation here
+			(ID, name, email, btc_amount, usd_val, operator, curr_price))
+	connect.commit()
+	
 
 def get_column(column, table, connection='test_table.sqlite', min_id = False):
 	"""Gets all the data from a single column in the table and returns an ordered list"""
@@ -131,25 +141,29 @@ def user_dict(row):
 		'btc_amount':row[3],
 		'usd_val': row[4],
 		'operator': row[5],
+		'current': row[6]
 	}
 
 
-def at_least(user_btc, market, user_usd):
+def at_least(user_btc, market, user_usd, user_price=None):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth at least the user defined USD amount"""
 	return float(user_btc)*float(market)>=user_usd
 
-def at_most(user_btc, market, user_usd):
+def at_most(user_btc, market, user_usd, user_price=None):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth no more than the user defined USD amount"""
 	return float(user_btc)*float(market)<=user_usd
 
-def minus_five_percent(user_btc, market, user_usd=None):
-	#THIS IS INCORRECT
+def minus_five_percent(user_btc, market, user_usd, user_price):
+	#user_usd is ignored
+	#user_btc is ignored
 	"""Returns True if the user's BTC amount has fallen by 5 percent in value"""
-	return float(user_btc)/float(market)<=0.95
+	return float(market)/float(user_price)<=0.95
 
-def plus_five_percent(user_btc, market, user_usd=None):
-	#THIS IS INCORRECT
-	return float(user_btc)/market>=1.05
+def plus_five_percent(user_btc, market, user_usd, user_price):
+	#user_usd is ignored
+	#user_btc is ignored
+	"""Returns True if the user's BTC amount has grown by 5 percent in value"""
+	return float(market)/float(user_price)>=1.05
 
  
 func_dict = {
@@ -171,32 +185,36 @@ def perform_check(d):
 	compare = None  # Initializing the local variables for reassignment below
 	message = None
 
-	print("perform check")
+	print("Checking...")
 
 	# Iterating through users in the table
 	for user in [user_dict(row) for row in cursor.execute('SELECT * FROM users')]:
-		print(user)
 		compare = func_dict[str(user['operator'])] # Select the comparator
-		print(compare)
-		if compare(user['btc_amount'], d['last'], user['usd_val']): # (delete ':' + this statement and uncomment) # and user['contact'] not in notified: 
-			print("goinggg ")
+		if compare(user['btc_amount'], d['last'], user['usd_val'], user['current']): # (delete ':' + this statement and uncomment) # and user['contact'] not in notified: 
+			print("Notification triggered!")
 			notify(user['name'], user['contact'], message) # Calling notification procedure
 			#notified.append(user['contact']) # Adding the user to the list of notified users.
 
-#TODO: test everything below
+
 def notify(name, contact, message):
-	print("notify")
+<<<<<<< HEAD
+=======
+	print("Notifying...")
+>>>>>>> origin/master
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
+	print("Creating a message object...")
 	msg = Message(
               'This is a test',
 	       sender='coinworthupdate@gmail.com',
 	       recipients=
                [contact])
-	print('here?')
 	msg.body = "Hello, %s. This is a test" % name
-	print("here")
+<<<<<<< HEAD
+	print("Passing to the mailbox...")
+=======
+>>>>>>> origin/master
 	mailbox.send(msg)
-	print('Sent')
+	print('Sent!')
 
 
 
