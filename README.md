@@ -13,7 +13,7 @@ control for notified users
 
 **DONE** style 
 
-write email templates
+**DONT** write email text
 
 switch to real databases
 
