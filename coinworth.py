@@ -53,7 +53,7 @@ def entry(ID=1):
 	# 	select at_least
 	# else, 
 	# 	select at_most
-	if float(btc) <= curr:
+	if float(btc) >= curr:
 		operator = 0
 	else:
 		operator = 1
@@ -82,7 +82,6 @@ def run_check():
 		update_prices(row, connection='test_table.sqlite') # Insert row
 		perform_check(market) 
 		graph()
-
 
 
 

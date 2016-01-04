@@ -165,19 +165,19 @@ def perform_check(market):
 		print(market.last, user.btc, user.operator)
 		if compare(market.last, user.btc): # and user['email'] not in notified: 
 			print("Notification triggered!")
-			notify(user.name, user.email, message) # Calling notification procedure
+			notify(user.name, user.email, user.btc) # Calling notification procedure
 			#notified.append(user['email']) # Adding the user to the list of notified users.
 
 
-def notify(name, email, message):
+def notify(name, email, btc):
 	"""Notifies the user at the provided email, using the body of the message determined by the comparing function"""
 	print("Creating a message object...")
 	msg = Message(
-              'This is a test',
+              'Bitcoin Price Alert!',
 	       sender='coinworthupdate@gmail.com',
 	       recipients=
                [email])
-	msg.body = "Hello, %s. This is a test" % name
+	msg.body = "Hello, %s. The price of bitcoin has just passed $%s. \nWe wish you happy trading and hope you have a great day! \nSincerely, \nCoinworth team. " % (name, btc) 
 	print("Passing to the mailbox...")
 	mailbox.send(msg)
 	print('Sent!')
