@@ -36,23 +36,30 @@ mailbox = Mail(app) # Initialize mail
 # Defining a route for the default URL, which loads the form
 @app.route('/')
 def form():
-	return render_template('form_submit.html')
+	return render_template('layout.html')
 
  
 # accepting: POST requests 
 @app.route('/confirmation/', methods=['POST'])
 def entry(ID=1):
 	# assigning form input to variables
-	name = request.form['yourname']
-	email = request.form['youremail']
-	btc_amount = request.form['btc_amount']
-	usd_val = request.form['usd_val']
-	operator = request.form['operator']
-	curr_price = get_last(response_dict())
+	name = request.form['Name']
+	email = request.form['Email']
+	btc = request.form['BTC']
+	operator = None
+
+	curr = Market().last
+	# if user specified a btc rate above or equal to current 
+	# 	select at_least
+	# else, 
+	# 	select at_most
+	if float(btc) <= curr:
+		operator = 0
+	else:
+		operator = 1
 	# entering the information into the database 
-	update_users(ID, name, email, btc_amount, usd_val, operator, curr_price)
-	ID += 1
-	return render_template('confirmation.html', name=name, btc_amount=btc_amount, usd_val=usd_val, operator=operator)
+	update_users(ID, name, email, btc, operator)
+	return render_template('confirmation.html', name = name)
 
 
 #######BACKGROUND PROCESS#######
@@ -67,13 +74,13 @@ def initialize():
 
 
 def run_check():
-	"""Main run code"""
+	"""Main run function"""
 	with app.app_context():
 		print("Sending a Bitstamp request")
-		d = response_dict() # Bitstamp response dict
-		row = create_row_template(d) # Row factory
+		market = Market() # Bitstamp response dict
+		row = create_row_template(market) # Row factory
 		update_prices(row, connection='test_table.sqlite') # Insert row
-		perform_check(d) 
+		perform_check(market) 
 		graph()
 
 

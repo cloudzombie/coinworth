@@ -1,0 +1,9 @@
+Dear {{ user.nickname }},
+
+Your BTC is now {{user.operator}}
+
+{{ url_for('user', nickname=follower.nickname, _external=True) }}
+
+Regards,
+
+The Coinworth team

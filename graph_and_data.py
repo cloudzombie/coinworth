@@ -2,6 +2,8 @@ import abstractions as ab
 from time import sleep
 import plotly.plotly as py
 from plotly.graph_objs import Scatter
+import plotly.tools as tls
+tls.set_credentials_file(username='lukeanders70', api_key='scl4ou57eu')
 
 def graph():
 	print("Graphing")
@@ -14,6 +16,5 @@ def graph():
 	trace0 = Scatter(x=x_data, y=y_data)
 	data = [trace0]
 	unique_url = py.plot(data, filename = 'basic-line', auto_open=False)
-	# waiting before running again
 
 
