@@ -130,8 +130,6 @@ func_dict = {
 # A dictionary for quick access to the comparator functions
 	"0": at_least,
 	"1": at_most,
-	"2": plus_five_percent,
-	"3": minus_five_percent
 }
 
 
