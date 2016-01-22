@@ -125,19 +125,6 @@ def at_least(market, btc):
 def at_most(market, btc):
 	"""Returns True if user's BTC amount converted to USD using market BTC price is worth no more than the user defined USD amount"""
 	return float(btc)<float(market)
-
-def minus_five_percent(btc, market, user_usd, user_price):
-	#user_usd is ignored
-	#btc is ignored
-	"""Returns True if the user's BTC amount has fallen by 5 percent in value"""
-	return float(market)/float(user_price)<=0.95
-
-def plus_five_percent(btc, market, user_usd, user_price):
-	#user_usd is ignored
-	#btc is ignored
-	"""Returns True if the user's BTC amount has grown by 5 percent in value"""
-	return float(market)/float(user_price)>=1.05
-
  
 func_dict = {
 # A dictionary for quick access to the comparator functions
