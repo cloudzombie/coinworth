@@ -1,4 +1,3 @@
-# Basics
 import datetime, requests, sqlite3, schedule,time
 # Shedule
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -7,13 +6,9 @@ import simplejson as json
 from flask import Flask, request, session, g, redirect, url_for, abort, \
 	 render_template, flash
 from flask.ext.mail import Mail # mail module
-from flask.ext.wtf import Form
-from wtforms.fields import TextField, PasswordField,  BooleanField, \
-		 FloatField, RadioField, SelectField
-from wtforms import validators
 # DB tools
 from contextlib import closing
-# Utility code
+# Utils
 from abstractions import *
 from graph_and_data import *
 import os

@@ -62,7 +62,7 @@ def create_user_table():
 
 def update_prices(row_temp, connection='test_table.sqlite'):
 	"""Updates database of prices with the values from the row template passed as a tuple"""
-	'''temporarily takes 8 or 9 length to make input work with or wothout row IDs'''
+	'''temporarily takes 8 or 9 length to make input work with or without row IDs'''
 	assert len(row_temp) == 8 or len(row_temp) == 9, "Invalid row template"
 	#Establish databse connection
 	connect=sqlite3.connect(connection)
